@@ -20,7 +20,7 @@ module Accessors
   end
 
   module ClassMethods
-    def attr_accessor_with_history(*atr_array)
+    def attr_accessor_with_history(*attr_array)
       attr_array.each do |name|
         name_method = "@#{name}".to_sym
         history = "@#{name}_history".to_sym
