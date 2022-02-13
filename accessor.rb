@@ -17,10 +17,11 @@
 module Accessors
   def self.included(base)
     base.extend ClassMethods
+    # base.send :include, InstansMethods
   end
 
   module ClassMethods
-    def attr_accessor_with_history(*atr_array)
+    def attr_accessor_with_history(*attr_array)
       attr_array.each do |name|
         name_method = "@#{name}".to_sym
         history = "@#{name}_history".to_sym
@@ -34,14 +35,38 @@ module Accessors
       end
     end
 
-    def strong_attr_accessor
+    def strong_attr_accessor(attr_name, class_name)
       name_method = "@#{attr_name}".to_sym
-      define_method(attr_name) { instance_variable_get(name_method) }
-      define_method("#{attr_name}=") do |value|
-        raise TypeError 'type is error' unless value.is_a?(klass)
+      define_method(attr_name) {instance_variable_get(name_method)}
+      define_method("#{attr_name}=".to_sym) do |value|
+          instance_variable_set(name_method, value)
+        raise 'type is error' unless value.is_a?(class_name)
         instance_variable_set(name_method, value)
+      rescue Exception => e
+        puts e.inspect
       end
     end
   end
 end
+
+class Test
+  include Accessors
+   attr_accessor_with_history :a, :b, :c
+   test = Test.new
+   test.a = 2
+   test.b = 3
+   test.c = 4
+   puts test.a
+   puts test.b
+   puts test.c
+   test.a = 5
+   test.a = 6
+   puts test.a_history.inspect
+
+   strong_attr_accessor :f, :String
+   test = Test.new
+   test.f = 'hello'
+   puts test.f
+end
+
 
