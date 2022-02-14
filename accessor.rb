@@ -37,10 +37,11 @@ module Accessors
 
     def strong_attr_accessor(attr_name, class_name)
       name_method = "@#{attr_name}".to_sym
+      class_name = class_name.to_s.capitalize
+      puts class_name
       define_method(attr_name) {instance_variable_get(name_method)}
       define_method("#{attr_name}=".to_sym) do |value|
-          instance_variable_set(name_method, value)
-        raise 'type is error' unless value.is_a?(class_name)
+        raise 'type is error' unless value.is_a?(Kernel.const_get(class_name))
         instance_variable_set(name_method, value)
       rescue Exception => e
         puts e.inspect
@@ -63,9 +64,9 @@ class Test
    test.a = 6
    puts test.a_history.inspect
 
-   strong_attr_accessor :f, :String
+   strong_attr_accessor :f, :integer
    test = Test.new
-   test.f = 'hello'
+   test.f = 5
    puts test.f
 end
 
